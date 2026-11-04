@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AlmaKids Map — Алматы балалар туристік картасы</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynhFw6MZrYlaXoKjMZ7tH6gY6j6M=" crossorigin="">
+<style>
+:root{--ink:#17324d;--muted:#62748a;--paper:#fffdf7;--card:#fff;--accent:#ff8b3d;--green:#5bbf8a;--shadow:0 14px 35px rgba(35,62,92,.13)}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:linear-gradient(180deg,#eaf8ff 0,#fffaf0 42%,#f5fff8 100%)}
+button{font:inherit}.top{padding:24px 18px 8px;max-width:1180px;margin:auto}.hero{background:linear-gradient(135deg,#fff 0,#fff9e9 100%);border:2px solid #fff;border-radius:30px;box-shadow:var(--shadow);padding:25px;position:relative;overflow:hidden}.hero:after{content:'🏔️';font-size:120px;position:absolute;right:22px;bottom:-35px;opacity:.12}.eyebrow{font-weight:800;color:#e36d24;letter-spacing:.06em}.hero h1{font-size:clamp(30px,5vw,58px);margin:6px 0 8px;line-height:1}.hero p{max-width:760px;color:var(--muted);font-size:17px}.stats{display:flex;gap:10px;flex-wrap:wrap}.pill{background:#fff;border:1px solid #dce8ef;padding:8px 12px;border-radius:999px;font-weight:700}
+.wrap{max-width:1500px;margin:auto;padding:16px 18px 50px}.map{height:min(76vh,820px);min-height:620px;background:linear-gradient(145deg,#dff4dc,#d9f0ff);border-radius:28px;position:relative;overflow:hidden;box-shadow:var(--shadow);border:6px solid white}.mountains{position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(145deg,transparent 0 18%,#aacbb6 18% 38%,transparent 38%),linear-gradient(35deg,transparent 0 35%,#8fb8a1 35% 55%,transparent 55%);opacity:.7}.road{position:absolute;background:#fff8d6;border:2px dashed #d7b96a;border-radius:50%}.r1{width:70%;height:25%;left:10%;top:35%;transform:rotate(-8deg)}.r2{width:45%;height:70%;left:36%;top:4%;transform:rotate(24deg)}.mapTitle{position:absolute;left:24px;top:22px;background:#fff;padding:10px 15px;border-radius:16px;font-weight:900;box-shadow:0 8px 20px #7fa0b52b}.pin{position:absolute;border:0;background:white;border-radius:18px;padding:9px 11px;box-shadow:0 7px 18px #3455;cursor:pointer;font-weight:800;transition:.2s}.pin:hover{transform:translateY(-4px) scale(1.03)}
+.sectionTitle{margin:30px 0 14px;font-size:26px}.routes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.route{border:0;text-align:left;padding:18px;border-radius:22px;background:#fff;box-shadow:0 8px 22px #30465c14;cursor:pointer;transition:.2s;border-left:8px solid var(--c)}.route:hover{transform:translateY(-3px)}.route .ico{font-size:34px}.route b{display:block;font-size:18px;margin:5px 0}.route small{color:var(--muted)}
+.panel{display:none;margin-top:18px}.panel.active{display:block}.places{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px}.place{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 8px 22px #30465c14;cursor:pointer}.place .photo{height:145px;display:grid;place-items:center;font-size:64px;background:linear-gradient(135deg,var(--c),#fff)}.place .body{padding:15px}.place h3{margin:0 0 7px}.place p{margin:0;color:var(--muted);font-size:14px}.badge{display:inline-block;margin-top:10px;background:#f3f7fa;padding:6px 9px;border-radius:10px;font-size:12px;font-weight:800}
+.modal{position:fixed;inset:0;background:#13283bbd;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.open{display:flex}.sheet{background:var(--paper);width:min(850px,100%);max-height:92vh;overflow:auto;border-radius:28px;box-shadow:0 25px 70px #0006}.cover{height:210px;display:grid;place-items:center;font-size:100px;background:linear-gradient(135deg,var(--c),#fff);position:relative}.close{position:absolute;right:14px;top:14px;border:0;background:#fff;border-radius:50%;width:42px;height:42px;font-size:20px;cursor:pointer}.content{padding:22px}.content h2{margin:0 0 6px;font-size:30px}.lead{color:var(--muted)}.info{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin:16px 0}.info div{background:#fff;border:1px solid #e5edf1;border-radius:14px;padding:10px}.fact,.task{border-radius:18px;padding:15px;margin:12px 0}.fact{background:#fff3d9}.task{background:#e9f9ef}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}.btn{border:0;border-radius:14px;padding:11px 14px;font-weight:850;cursor:pointer;background:#17324d;color:#fff}.btn.alt{background:#fff;color:#17324d;border:1px solid #ccdbe4}.btn.taskbtn{background:#36a96b}.answer{display:none;margin-top:10px;font-weight:800}.answer.show{display:block}.progress{height:10px;background:#e8eef2;border-radius:99px;overflow:hidden;margin:12px 0}.progress i{display:block;height:100%;width:0;background:#50b97d;transition:.3s}.foot{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}@media(max-width:600px){.map{height:68vh;min-height:520px}.info{grid-template-columns:1fr}.pin{font-size:12px;padding:7px}.hero{padding:20px}.cover{height:165px}}
+.route-map-label{font-weight:900;font-size:12px;border:0;border-radius:10px;padding:5px 8px;box-shadow:0 3px 10px #0002}.leaflet-tooltip-top:before{display:none}</style></head>
+<body>
+<div class="top"><section class="hero"><div class="eyebrow">ALMAKIDS MAP • ЗЕРТТЕ • ОЙНА • САЯХАТТА</div><h1>Алматыны баламен бірге аш! 🗺️</h1><p>7 тақырыптық бағыт, 35 қызықты нүкте және әр нысанда шағын миссия. Маршрутты таңда, нүктені аш, тапсырманы орында да келесі аялдамаға өт.</p><div class="stats"><span class="pill">🧭 7 бағыт</span><span class="pill">📍 35 нысан</span><span class="pill">🎯 35 тапсырма</span><span class="pill">👨‍👩‍👧 Отбасылық формат</span></div></section></div>
+<main class="wrap">
+<section class="map" id="map"><div id="cityMap" style="height:100%;width:100%"></div><div class="mapTitle" style="z-index:500">🗺️ Алматы қаласы • туристік нысандар картада белгіленген</div></section>
+<h2 class="sectionTitle">7 туристік бағыт</h2><section class="routes" id="routes"></section><section class="panel" id="panel"><h2 id="panelTitle"></h2><div class="places" id="places"></div></section>
+<div class="foot">ℹ️ Уақыт, баға және қолжетімділік өзгеруі мүмкін. Сапар алдында нысанның ресми парақшасынан нақтылаған дұрыс.</div></main>
+<div class="modal" id="modal"><article class="sheet"><div class="cover" id="cover"><button class="close" onclick="closeModal()">✕</button><span id="bigIcon"></span></div><div class="content"><div id="routeTag" class="badge"></div><h2 id="mTitle"></h2><p class="lead" id="mDesc"></p><div class="progress"><i id="prog"></i></div><div class="info" id="info"></div><div class="fact"><b>💡 Қызықты дерек</b><div id="fact"></div></div><div class="task"><b>🎯 Тапсырманы орында</b><div id="task"></div><button class="btn taskbtn" style="margin-top:10px" onclick="completeTask()">✓ Орындадым!</button><div class="answer" id="answer">🏅 Керемет! Бұл нүктенің белгісін жинадың.</div></div><div class="actions"><button class="btn" onclick="showMap()">📍 Картадан көрсету</button><button class="btn alt" onclick="goHome()">← Басты бетке қайту</button><button class="btn" onclick="nextPlace()">Келесі нүктеге өту →</button></div></div></article></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+const routes=[
+{id:'history',icon:'🏛️',name:'Тарих ізімен',color:'#f3b562',desc:'Қаланың өткенімен танысатын тарихи аялдамалар.'},
+{id:'nature',icon:'🌿',name:'Табиғатты таны',color:'#73c99b',desc:'Таулар, бақтар және таза ауадағы серуен.'},
+{id:'culture',icon:'🎨',name:'Мәдениет әлемі',color:'#c69bea',desc:'Театр, өнер, музыка және шығармашылық.'},
+{id:'fun',icon:'🎡',name:'Көңілді саяхат',color:'#ff8fa3',desc:'Ойын, жануарлар және отбасылық демалыс.'},
+{id:'sport',icon:'🏃',name:'Спорттық маршрут',color:'#6fb8ef',desc:'Қозғалыс, мұз, тау және белсенді демалыс.'},
+{id:'science',icon:'🧠',name:'Білім мен ғылым',color:'#8aa4ff',desc:'Ғылымға қызығатын кішкентай зерттеушілерге.'},
+{id:'heritage',icon:'🇰🇿',name:'Ұлттық мұра',color:'#e5a85a',desc:'Қазақтың өнері, музыкасы және ұлттық жады.'}
+];
+const P=(route,name,icon,age,time,cost,how,food,access,why,desc,fact,task,map)=>({route,name,icon,age,time,cost,how,food,access,why,desc,fact,task,map});
+const places=[
+P('history','Алматы музейі','🏛️','7+','1–1,5 сағ','Ақылы','Автобус/такси, Қабанбай батыр көшесі','Жақын маңда бар','Ішінара','Қаланың тарихын бір жерден көреді','Алматының көне дәуірден қазіргі мегаполиске дейінгі тарихын таныстыратын қалалық музей.','Алматы бұрын Верный атауымен белгілі болған.','Музейден қаланың ескі атауына қатысты бір белгі тауып, оны 3 сөзбен сипатта.','https://www.google.com/maps/search/?api=1&query=Almaty+Museum'),
+P('history','28 гвардияшы-панфиловшылар саябағы','🕊️','6+','45–60 мин','Тегін','Қоғамдық көлікпен орталыққа','Иә','Иә','Тарих пен саябақты қатар таниды','Қаланың орталығындағы тарихи-мемориалдық саябақ.','Саябақ 1942 жылы қазіргі атауына ие болды.','Мемориалдағы 3 символды тап: от, жұлдыз, жауынгер бейнесі. Олардың мағынасын түсіндір.','https://www.google.com/maps/search/?api=1&query=Panfilov+Park+Almaty'),
+P('history','Вознесенск кафедралды соборы','⛪','7+','30–45 мин','Тегін','Панфилов саябағы ішінде','Жақын маңда','Ішінара','Ерекше сәулетін бақылайды','Алматыдағы ең танымал тарихи сәулет нысандарының бірі.','Ғимараттың ағаш конструкциясы оның ең белгілі ерекшеліктерінің бірі.','Ғимараттан 3 геометриялық пішін тап: шеңбер, үшбұрыш, тік төртбұрыш.','https://www.google.com/maps/search/?api=1&query=Ascension+Cathedral+Almaty'),
+P('history','Тәуелсіздік монументі','🗿','7+','30 мин','Тегін','Республика алаңы','Иә','Иә','Қазақстан тарихының рәміздерін іздейді','Республика алаңындағы тәуелсіздік идеясын бейнелейтін монумент.','Композицияның төбесінде Алтын адам бейнесі орналасқан.','Монументтен 5 ұлттық/тарихи символ тауып, біреуінің мағынасын айт.','https://www.google.com/maps/search/?api=1&query=Independence+Monument+Almaty'),
+P('history','Райымбек батыр ескерткіші','🐎','8+','20–30 мин','Тегін','Райымбек даңғылы маңы','Иә','Ішінара','Тарихи тұлға туралы біледі','Қазақ батыры Райымбекке арналған қалалық ескерткіш.','Райымбек батырдың есімі Алматыдағы ірі даңғылға берілген.','Ескерткіштің позасына қарап, мүсінші қандай мінезді көрсеткісі келгенін 2 сөзбен айт.','https://www.google.com/maps/search/?api=1&query=Raiymbek+Batyr+Monument+Almaty'),
+P('nature','Бас ботаникалық бақ','🌱','5+','1,5–2 сағ','Ақылы','Тимирязев көшесі, автобус/такси','Иә/маңында','Иә','Өсімдіктерді тірідей зерттейді','Қаланың үлкен жасыл ғылыми кеңістігі, әртүрлі өсімдіктер коллекциясы бар.','Бақта әр климаттық аймақтан әкелінген өсімдіктер өседі.','«Жапырақ детективі»: пішіні әртүрлі 4 жапырақты тауып, суретін сал.','https://www.google.com/maps/search/?api=1&query=Main+Botanical+Garden+Almaty'),
+P('nature','Көктөбе','🚠','5+','2–3 сағ','Кіру тегін, қызметтер ақылы','Аспалы жол/автобус/такси','Иә','Ішінара','Қаланы биіктен көреді','Алматыға жоғарыдан панорама ашылатын танымал төбе және демалыс аймағы.','Көктөбеден қаланың тау мен жазық арасындағы орналасуын жақсы байқауға болады.','Панорамадан 3 бағдар тап: тау, биік ғимарат, жасыл аймақ. Бағытын анықта.','https://www.google.com/maps/search/?api=1&query=Kok+Tobe+Almaty'),
+P('nature','Терренкур','💧','6+','1–1,5 сағ','Тегін','Достық даңғылы маңынан жаяу','Кафелер маңында','Ішінара','Өзен бойымен қозғалып, табиғатты бақылайды','Кіші Алматы өзені бойындағы серуен және сауықтыру жолы.','«Терренкур» сөзі емдік жаяу жүру маршруты деген ұғыммен байланысты.','10 минутта естіген 5 табиғи дыбысты сана да «дыбыс картасын» жаса.','https://www.google.com/maps/search/?api=1&query=Terrenkur+Almaty'),
+P('nature','Тұңғыш Президент саябағы','🌳','4+','1–2 сағ','Тегін','Әл-Фараби/Навои маңы','Иә','Иә','Кең алаңда серуендеп, тауды бақылайды','Үлкен жасыл аумағы, аллеялары және тау көрінісі бар қалалық саябақ.','Ашық күндері Іле Алатауының жоталары айқын көрінеді.','«Тау силуэті»: таудың сызығын 30 секундта қағазға түсір.','https://www.google.com/maps/search/?api=1&query=First+President+Park+Almaty'),
+P('nature','Сайран су қоймасы','🌊','6+','1 сағ','Тегін','Қоғамдық көлік/такси','Иә/маңында','Ішінара','Қала ішіндегі су экожүйесін бақылайды','Алматының батыс бөлігіндегі ірі су айдыны және демалыс кеңістігі.','Су айдыны қаланың ландшафтында ерекше көк кеңістік қалыптастырады.','Судың маңынан тірі табиғаттың 5 белгісін тап: құс, өсімдік, жәндік т.б.','https://www.google.com/maps/search/?api=1&query=Sayran+Lake+Almaty'),
+P('culture','Абай атындағы опера және балет театры','🎭','7+','1,5–3 сағ','Ақылы','Қабанбай батыр көшесі','Иә','Ішінара','Сахна өнерін көреді','Қазақстандағы белгілі опера және балет сахналарының бірі.','Театр Абай Құнанбайұлының есімімен аталады.','Қойылым алдында 3 эмоция таңда; соңында қай эмоция басым болғанын салыстыр.','https://www.google.com/maps/search/?api=1&query=Abai+Opera+House+Almaty'),
+P('culture','Ә. Қастеев атындағы өнер музейі','🖼️','7+','1–2 сағ','Ақылы','Сәтбаев көшесі маңы','Иә/маңында','Ішінара','Кескіндеме мен ұлттық өнерді көреді','Қазақстанның бейнелеу өнеріне арналған ірі музейлерінің бірі.','Әбілхан Қастеев қазақ бейнелеу өнерінің көрнекті өкілдерінің бірі.','Бір картинаны таңда: одан 5 түс тап та, картинаның көңіл күйін бір сөйлеммен айт.','https://www.google.com/maps/search/?api=1&query=Kasteev+Museum+Almaty'),
+P('culture','Ғ. Мүсірепов атындағы балалар мен жасөспірімдер театры','🎟️','6+','1,5–2 сағ','Ақылы','Абылай хан даңғылы маңы','Иә','Ішінара','Балаларға арналған сахналық оқиға','Балалар мен жасөспірім көрерменге бағытталған театр.','Театр Ғабит Мүсіреповтің есімімен аталады.','Қойылымнан кейін өзіңе ұнаған кейіпкерге 1 минуттық жаңа финал ойлап тап.','https://www.google.com/maps/search/?api=1&query=Musrepov+Theatre+Almaty'),
+P('culture','Республика сарайы және Абай алаңы','🎼','6+','45–90 мин','Алаң тегін, іс-шара ақылы','Достық даңғылы','Иә','Иә','Қаланың мәдени ортасын сезінеді','Концерттер өтетін сарай және оның алдындағы танымал қоғамдық алаң.','Алаңда Абай ескерткіші орналасқан.','Абай ескерткішін тауып, ақынға қоятын бір сұрағыңды ойлап жаз.','https://www.google.com/maps/search/?api=1&query=Palace+of+Republic+Almaty'),
+P('culture','Панфилов жаяу жүргіншілер көшесі','🎨','5+','1–2 сағ','Тегін','Қала орталығы','Иә','Иә','Көше өнері мен қала атмосферасын көреді','Жаяу серуенге, көше мәдениетіне және демалысқа арналған орталық кеңістік.','Бұл аймақ қала тұрғындары мен қонақтарының танымал серуен орны.','«Қала фотографы»: 3 кадр тақырыбын тап — түс, қозғалыс, симметрия.','https://www.google.com/maps/search/?api=1&query=Panfilov+Street+Almaty'),
+P('fun','Орталық демалыс саябағы','🎡','3+','2–4 сағ','Кіру/аттракцион шарттары әртүрлі','Гоголь көшесі маңы','Иә','Ішінара','Аттракцион, серуен, ойын','Алматыдағы отбасылық демалысқа арналған ең танымал жасыл аймақтардың бірі.','Саябақта әр маусымға сай әртүрлі демалыс түрлері бар.','«Батылдық шкаласы»: 3 аттракционды 1–5 аралығында бағалап, неге солай таңдағаныңды айт.','https://www.google.com/maps/search/?api=1&query=Central+Park+Almaty'),
+P('fun','Алматы хайуанаттар бағы','🦒','3+','2–3 сағ','Ақылы','Есенберлин көшесі','Иә','Ішінара','Жануарларды бақылап үйренеді','Көптеген жануар түрлерін таныстыратын қалалық зообақ.','Зообақ Орталық демалыс саябағына жақын орналасқан.','«Зоолог миссиясы»: 3 жануарды таңдап, олардың қорегі мен мекенін салыстыр.','https://www.google.com/maps/search/?api=1&query=Almaty+Zoo'),
+P('fun','Көктөбе ойын-сауық аймағы','🎠','4+','2–3 сағ','Қызметтер ақылы','Аспалы жол/такси','Иә','Ішінара','Биіктегі ойын-сауық пен панорама','Көктөбедегі отбасылық демалыс, көрініс және ойын аймақтары.','Кешкі уақытта қала шамдарын биіктен көруге болады.','«Шамдар санағы»: 30 секундта көрінетін 3 түрлі жарық көзін тап.','https://www.google.com/maps/search/?api=1&query=Kok+Tobe+Park+Almaty'),
+P('fun','Family Park','🎢','4+','2–3 сағ','Ақылы','Алматы батыс бөлігі, автобус/такси','Иә','Ішінара','Балалар аттракциондары','Отбасылық серуен мен аттракциондарға арналған демалыс орны.','Парк атауының өзі отбасылық форматқа бағытталғанын көрсетеді.','Өзіңнің «идеал аттракционыңды» ойлап тауып, атауын және 2 қауіпсіздік ережесін жаз.','https://www.google.com/maps/search/?api=1&query=Family+Park+Almaty'),
+P('fun','Арбат — Жібек жолы жаяу аймағы','🎈','5+','1–2 сағ','Тегін','Жібек жолы көшесі','Иә','Ішінара','Көше музыкасы, суретшілер, серуен','Қаланың жаяу серуенге арналған танымал орталық бөліктерінің бірі.','Мұнда қала мәдениеті мен сауда кеңістігі қатар тоғысады.','«Арбат бинго»: музыка, сурет, кәдесый, субұрқақ/безендіру, ерекше ғимарат — 5-еуін тап.','https://www.google.com/maps/search/?api=1&query=Arbat+Almaty'),
+P('sport','Медеу','⛸️','5+','2–3 сағ','Ақылы қызметтер бар','Автобус/такси, Медеу шатқалы','Иә','Ішінара','Әлемге әйгілі биік таулы мұз айдыны','Іле Алатауы бөктеріндегі әйгілі спорт және туристік кешен.','Медеу шамамен 1700 м биіктікте орналасқан.','«Биіктік тәжірибесі»: қала орталығы мен Медеудегі ауа/температура сезімін 3 белгімен салыстыр.','https://www.google.com/maps/search/?api=1&query=Medeu+Almaty'),
+P('sport','Шымбұлақ','🎿','6+','3–5 сағ','Ақылы','Медеуден аспалы жол','Иә','Ішінара','Тау спорты мен аспалы жол','Алматы маңындағы танымал тау курорты, қысқы және маусымдық белсенділік бар.','Медеуден Шымбұлаққа аспалы жолмен көтерілуге болады.','Маршруттағы биіктік өзгерісін елестетіп, «тау профилін» сызықпен сал.','https://www.google.com/maps/search/?api=1&query=Shymbulak+Almaty'),
+P('sport','Орталық стадион','⚽','6+','1–2 сағ','Іс-шараға байланысты','Абай даңғылы маңы, метро/автобус','Иә','Ішінара','Үлкен спорт аренасын көреді','Алматыдағы ірі спорт нысандарының бірі.','Стадионда футбол және басқа спорттық іс-шаралар өткізіледі.','Стадионды айналып көріп, спортшыға керек 5 қасиетті ата.','https://www.google.com/maps/search/?api=1&query=Central+Stadium+Almaty'),
+P('sport','Балуан Шолақ атындағы спорт сарайы','🏀','6+','1–2 сағ','Іс-шараға байланысты','Абай даңғылы','Иә','Ішінара','Жабық аренадағы спортты көреді','Спорттық жарыстар мен мәдени іс-шаралар өтетін қалалық арена.','Сарай атақты балуан әрі өнерпаз Балуан Шолақтың есімімен аталады.','«Спорт комментаторы»: көрген бір спорт әрекетін 20 секундта әсерлі баянда.','https://www.google.com/maps/search/?api=1&query=Baluan+Sholak+Sports+Palace+Almaty'),
+P('sport','Есентай өзені бойындағы вело/жаяу маршрут','🚲','7+','1–2 сағ','Тегін','Өзен бойындағы қолайлы бөліктен','Кафелер маңында','Ішінара','Қала ішінде белсенді қозғалыс','Есентай бойындағы серуен және қозғалысқа қолайлы қалалық кеңістік.','Өзен аңғары қалаға табиғи бағыт сызығын береді.','15 минутта қадам санын есепте де, 1 сағатта шамамен қанша қадам болатынын болжа.','https://www.google.com/maps/search/?api=1&query=Esentai+River+Almaty'),
+P('science','Фесенков атындағы астрофизика институты обсерваториясы','🔭','9+','1–2 сағ','Экскурсия шартына байланысты','Каменское плато, алдын ала жоспарлау','Шектеулі','Алдын ала нақтылау','Ғарыш пен телескопты шынайы ортада таниды','Алматыдағы астрономиялық зерттеулермен байланысты ғылыми нысан.','Таудағы қараңғы аспан мен таза ауа астрономиялық бақылауға қолайлы.','«Астроном»: аспанда көргің келетін 3 нысанды жазып, ең қызығын таңда.','https://www.google.com/maps/search/?api=1&query=Fesenkov+Astrophysical+Institute+Almaty'),
+P('science','Қазақстан Республикасының Ұлттық орталық музейі','🦣','7+','1,5–2 сағ','Ақылы','Самал-1, қоғамдық көлік','Иә/маңында','Ішінара','Археология, тарих, табиғат экспонаттары','Қазақстан тарихы мен мәдениетінің кең коллекциясын таныстыратын ірі музей.','Музей қорында әр дәуірге қатысты археологиялық және этнографиялық материалдар бар.','«Уақыт машинасы»: 3 экспонатты ең көнеден ең жаңасына ретте.','https://www.google.com/maps/search/?api=1&query=Central+State+Museum+Kazakhstan'),
+P('science','Алматы Планетарийі / астрономиялық бағдарлама','🪐','7+','1–1,5 сағ','Бағдарламаға байланысты','Іс-шара орнына қарай алдын ала тексеру','Алдын ала тексеру','Алдын ала тексеру','Ғарышты көрнекі форматта үйренеді','Астрономия тақырыбындағы балалар бағдарламасын маршруттың ғылым аялдамасы ретінде пайдалануға болады.','Жұлдыз картасы арқылы аспандағы бағыттарды үйренуге болады.','Өзіңнің жаңа шоқжұлдызыңды ойлап тап: 5 жұлдызды қосып, атау бер.','https://www.google.com/maps/search/?api=1&query=planetarium+Almaty'),
+P('science','Қазақстан Ұлттық кітапханасы','📚','8+','1–2 сағ','Кіру шартын нақтылау','Абай даңғылы','Иә/маңында','Ішінара','Үлкен кітап әлемін көреді','Елдегі ірі кітапханалардың бірі, зерттеу мен оқу мәдениетінің маңызды орны.','Кітапхана қорында түрлі тілдер мен тақырыптардағы басылымдар сақталады.','«Кітап детективі»: Алматы туралы бір кітап/басылым тауып, атауынан 3 кілт сөз жаз.','https://www.google.com/maps/search/?api=1&query=National+Library+Kazakhstan+Almaty'),
+P('science','Оқушылар сарайы','🤖','6+','1–2 сағ','Үйірме/іс-шараға байланысты','Достық даңғылы','Иә/маңында','Ішінара','Үйірмелер мен шығармашылық зертхана атмосферасы','Балаларға арналған білім, шығармашылық және қосымша даму орталығы.','Мұнда ғылымнан өнерге дейін әртүрлі бағыттағы балалар қызметтері болуы мүмкін.','Өзің ашқың келетін ғылыми үйірмені ойлап тап: атауы + 1 тәжірибе.','https://www.google.com/maps/search/?api=1&query=Palace+of+Schoolchildren+Almaty'),
+P('heritage','Ықылас атындағы халық музыкалық аспаптар музейі','🪕','6+','1–1,5 сағ','Ақылы','Панфилов саябағы, Зенков көшесі','Жақын маңда','Ішінара','Домбыра және дәстүрлі аспаптарды көреді','Қазақ және басқа халықтардың дәстүрлі музыкалық аспаптарына арналған музей.','Музей ғимаратының өзі де тарихи сәулет ескерткіштерінің бірі.','«Дыбысты тап»: 3 аспапты таңдап, олардың дыбысын жоғары/төмен, жұмсақ/қатты деп сипатта.','https://www.google.com/maps/search/?api=1&query=Museum+of+Folk+Musical+Instruments+Almaty'),
+P('heritage','Орталық мемлекеттік музейдің этнография залдары','🏺','7+','1–2 сағ','Ақылы','Самал-1','Иә/маңында','Ішінара','Киіз үй, тұрмыс, киім мәдениетін таниды','Ұлттық тұрмыс пен дәстүрге қатысты экспонаттарды зерттеуге қолайлы аялдама.','Этнографиялық заттар халықтың күнделікті өмірі мен дүниетанымын көрсетеді.','«Этнограф»: бір тұрмыстық затты таңда да, қазіргі замандағы баламасын тап.','https://www.google.com/maps/search/?api=1&query=Central+State+Museum+Kazakhstan'),
+P('heritage','Жасыл базар','🍎','7+','45–90 мин','Кіру тегін, сауда ақылы','Жібек жолы/Зенков маңы','Иә','Ішінара','Ұлттық дәм мен базар мәдениетін сезінеді','Алматының танымал сауда орындарының бірі, азық-түлік пен жергілікті өнімдер кездеседі.','Базар — қаланың күнделікті мәдениетін бақылауға болатын тірі орта.','«Дәм картасы»: 5 өнімді тәтті, қышқыл, тұзды, хош иісті деп топтастыр.','https://www.google.com/maps/search/?api=1&query=Green+Bazaar+Almaty'),
+P('heritage','Арбаттағы қолөнер және кәдесый кеңістігі','🧵','6+','1 сағ','Тегін/сауда ақылы','Жібек жолы жаяу аймағы','Иә','Ішінара','Қолөнер бұйымдарын салыстырады','Жаяу аймақта суретшілер, шеберлер және кәдесый өнімдері жиі кездесетін қалалық мәдени кеңістік.','Қазақ ою-өрнегінде симметрия мен қайталану жиі қолданылады.','«Ою зертханасы»: бір оюды тауып, оның симметрия осін көрсетіп, өз нұсқаңды сал.','https://www.google.com/maps/search/?api=1&query=Arbat+Almaty'),
+P('heritage','Абай ескерткіші','📜','6+','20–30 мин','Тегін','Абай алаңы, Достық даңғылы','Иә','Иә','Ұлы ақын мұрасымен байланысады','Қазақтың ұлы ақыны Абай Құнанбайұлына арналған танымал ескерткіш.','Ескерткіш Алматыдағы Абай атындағы маңызды мәдени кеңістіктің бір бөлігі.','Абайдың бір нақылын еске түсір немесе үлкендерден сұрап жаз; оны өз сөзіңмен түсіндір.','https://www.google.com/maps/search/?api=1&query=Abai+Monument+Almaty')
+];
+let currentRoute='history', currentIndex=0, completed=new Set();
+const $=id=>document.getElementById(id);
+function renderRoutes(){ $('routes').innerHTML=routes.map(r=>`<button class="route" style="--c:${r.color}" onclick="selectRoute('${r.id}')"><span class="ico">${r.icon}</span><b>${r.name}</b><small>${r.desc}</small></button>`).join(''); }
+function selectRoute(id){currentRoute=id;cityMap.closePopup();const r=routes.find(x=>x.id===id);$('panel').classList.add('active');$('panelTitle').textContent=`${r.icon} ${r.name}`;$('places').innerHTML=places.filter(p=>p.route===id).map((p,i)=>`<article class="place" style="--c:${r.color}" onclick="openPlace('${id}',${i})"><div class="photo">${p.icon}</div><div class="body"><h3>${p.name}</h3><p>${p.desc}</p><span class="badge">🎯 Миссия бар</span></div></article>`).join('');$('panel').scrollIntoView({behavior:'smooth',block:'start'});}
+function openPlace(route,index){currentRoute=route;currentIndex=index;const arr=places.filter(p=>p.route===route),p=arr[index],r=routes.find(x=>x.id===route);$('cover').style.setProperty('--c',r.color);$('bigIcon').textContent=p.icon;$('routeTag').textContent=`${r.icon} ${r.name} • ${index+1}/${arr.length}`;$('mTitle').textContent=p.name;$('mDesc').textContent=p.desc;$('info').innerHTML=`<div>👧 <b>Жас:</b> ${p.age}</div><div>⏱️ <b>Уақыт:</b> ${p.time}</div><div>💰 <b>Бағасы:</b> ${p.cost}</div><div>🚶 <b>Жету:</b> ${p.how}</div><div>🍴 <b>Тамақ:</b> ${p.food}</div><div>♿ <b>Қолжетімділік:</b> ${p.access}</div><div style="grid-column:1/-1">⭐ <b>Балаға несімен қызық?</b> ${p.why}</div>`;$('fact').textContent=p.fact;$('task').textContent=p.task;$('answer').classList.toggle('show',completed.has(p.name));$('prog').style.width=(completed.size/places.length*100)+'%';$('modal').classList.add('open');document.body.style.overflow='hidden';}
+function openByName(name){let p=places.find(x=>x.name===name);if(!p)return;let arr=places.filter(x=>x.route===p.route);openPlace(p.route,arr.findIndex(x=>x.name===name));}
+function closeModal(){$('modal').classList.remove('open');document.body.style.overflow=''}
+function nextPlace(){let arr=places.filter(p=>p.route===currentRoute);openPlace(currentRoute,(currentIndex+1)%arr.length)}
+function goHome(){closeModal();$('panel').classList.remove('active');window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>cityMap.invalidateSize(),350)}
+function completeTask(){let p=places.filter(x=>x.route===currentRoute)[currentIndex];completed.add(p.name);$('answer').classList.add('show');$('prog').style.width=(completed.size/places.length*100)+'%';}
+function showMap(){let p=places.filter(x=>x.route===currentRoute)[currentIndex];window.open(p.map,'_blank','noopener')}
+const cityMap=L.map('cityMap',{scrollWheelZoom:true,zoomControl:true,minZoom:9});
+// Алматы қаласының солтүстіктен тау бөктеріне дейінгі негізгі аумағын бір экранға сыйғызу.
+const almatyBounds=L.latLngBounds([[43.08,76.66],[43.40,77.18]]);
+cityMap.fitBounds(almatyBounds,{padding:[22,22]});
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(cityMap);
+
+// Әр туристік НЫСАН картадағы өзінің орнына жуық координатамен белгіленеді.
+// Белгінің эмодзиі оның 7 бағытының бірін көрсетеді және карта ашылған сәттен көрініп тұрады.
+const placeCoords={
+'Алматы музейі':[43.2559,76.9387],
+'28 гвардияшы-панфиловшылар саябағы':[43.2586,76.9533],
+'Вознесенск кафедралды соборы':[43.2587,76.9528],
+'Тәуелсіздік монументі':[43.2385,76.9451],
+'Райымбек батыр ескерткіші':[43.2687,76.9440],
+'Бас ботаникалық бақ':[43.2241,76.9143],
+'Көктөбе':[43.2330,76.9762],
+'Терренкур':[43.2310,76.9605],
+'Тұңғыш Президент саябағы':[43.1936,76.8865],
+'Сайран су қоймасы':[43.2384,76.8582],
+'Абай атындағы опера және балет театры':[43.2487,76.9430],
+'Ә. Қастеев атындағы өнер музейі':[43.2354,76.9194],
+'Ғ. Мүсірепов атындағы балалар мен жасөспірімдер театры':[43.2647,76.9384],
+'Республика сарайы және Абай алаңы':[43.2441,76.9580],
+'Панфилов жаяу жүргіншілер көшесі':[43.2610,76.9438],
+'Орталық демалыс саябағы':[43.2635,76.9741],
+'Алматы хайуанаттар бағы':[43.2638,76.9816],
+'Көктөбе ойын-сауық аймағы':[43.2335,76.9769],
+'Family Park':[43.2300,76.8405],
+'Арбат — Жібек жолы жаяу аймағы':[43.2632,76.9405],
+'Медеу':[43.1575,77.0588],
+'Шымбұлақ':[43.1280,77.0807],
+'Орталық стадион':[43.2380,76.9245],
+'Балуан Шолақ атындағы спорт сарайы':[43.2389,76.9278],
+'Есентай өзені бойындағы вело/жаяу маршрут':[43.2210,76.9355],
+'Фесенков атындағы астрофизика институты обсерваториясы':[43.1847,76.9588],
+'Қазақстан Республикасының Ұлттық орталық музейі':[43.2359,76.9493],
+'Алматы Планетарийі / астрономиялық бағдарлама':[43.1849,76.9592],
+'Қазақстан Ұлттық кітапханасы':[43.2403,76.9443],
+'Оқушылар сарайы':[43.2256,76.9550],
+'Ықылас атындағы халық музыкалық аспаптар музейі':[43.2576,76.9552],
+'Орталық мемлекеттік музейдің этнография залдары':[43.2359,76.9493],
+'Жасыл базар':[43.2630,76.9567],
+'Арбаттағы қолөнер және кәдесый кеңістігі':[43.2631,76.9400],
+'Абай ескерткіші':[43.2444,76.9576]
+};
+const markerGroup=L.layerGroup().addTo(cityMap);
+places.forEach((p,idx)=>{
+ const ll=placeCoords[p.name]; if(!ll) return;
+ const r=routes.find(x=>x.id===p.route);
+ const html=`<div style="width:42px;height:42px;display:grid;place-items:center;background:${r.color};border:3px solid #fff;border-radius:50%;box-shadow:0 4px 12px #0007;font-size:23px;cursor:pointer">${r.icon}</div>`;
+ const icon=L.divIcon({className:'',html,iconSize:[42,42],iconAnchor:[21,21],popupAnchor:[0,-22]});
+ const m=L.marker(ll,{icon,zIndexOffset:500}).addTo(markerGroup);
+ m.bindTooltip(`${r.icon} ${p.name}`,{direction:'top',offset:[0,-18],opacity:.95});
+ m.on('click',()=>{ const arr=places.filter(x=>x.route===p.route); openPlace(p.route,arr.findIndex(x=>x.name===p.name)); });
+});
+
+// Жоғарғы оң жақта 7 бағыттың түсіндірмесі үнемі көрінеді.
+const Legend=L.Control.extend({options:{position:'topright'},onAdd:function(){
+ const d=L.DomUtil.create('div'); d.style.cssText='background:#ffffffee;padding:9px 11px;border-radius:14px;box-shadow:0 4px 16px #0003;font-size:12px;line-height:1.7;font-weight:800;max-width:170px';
+ d.innerHTML=routes.map(r=>`<div style="cursor:pointer" data-route="${r.id}">${r.icon} ${r.name}</div>`).join('');
+ L.DomEvent.disableClickPropagation(d);
+ d.querySelectorAll('[data-route]').forEach(el=>el.onclick=()=>selectRoute(el.dataset.route));
+ return d;
+}}); new Legend().addTo(cityMap);
+
+// Қаланың шекаралық көрінісін қайта қалпына келтіру батырмасы.
+const HomeControl=L.Control.extend({options:{position:'topleft'},onAdd:function(){
+ const b=L.DomUtil.create('button'); b.innerHTML='🏙️'; b.title='Алматыны толық көрсету';
+ b.style.cssText='width:34px;height:34px;background:white;border:2px solid #bbb;border-radius:5px;font-size:18px;cursor:pointer';
+ L.DomEvent.disableClickPropagation(b); L.DomEvent.on(b,'click',()=>cityMap.fitBounds(almatyBounds,{padding:[22,22]})); return b;
+}}); new HomeControl().addTo(cityMap);
+L.control.scale({imperial:false}).addTo(cityMap);
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});renderRoutes();
+</script></body></html>
